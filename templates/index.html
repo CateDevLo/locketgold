@@ -1,0 +1,2747 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#00ffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="manifest" href="/static/manifest.json" />
+    <title>Locket Gold Unlocker</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #00ffff;
+        --secondary-color: #ff00ff;
+        --primary-gradient: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--secondary-color) 100%
+        );
+        --bg-color: #030305;
+        --card-bg: rgba(10, 10, 15, 0.4);
+        --text-color: #ffffff;
+        --text-secondary: #a0a0b0;
+        --input-bg: rgba(255, 255, 255, 0.02);
+        --border-color: rgba(0, 255, 255, 0.2);
+        --glass-border: 1px solid rgba(0, 255, 255, 0.15);
+        --neon-glow:
+          0 0 20px rgba(0, 255, 255, 0.4), 0 0 40px rgba(255, 0, 255, 0.2);
+      }
+
+      body {
+        font-family: "Outfit", sans-serif;
+        background-color: var(--bg-color);
+        background-image:
+          radial-gradient(
+            circle at 15% 50%,
+            rgba(0, 255, 255, 0.08) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 85% 30%,
+            rgba(255, 0, 255, 0.08) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 50% 80%,
+            rgba(0, 255, 255, 0.05) 0%,
+            transparent 50%
+          );
+        background-attachment: fixed;
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+        animation: bg-pulse 10s ease-in-out infinite alternate;
+      }
+
+      @keyframes bg-pulse {
+        0% {
+          background-position: 0% 0%;
+        }
+
+        100% {
+          background-position: 100% 100%;
+        }
+      }
+
+      /* ── Aurora Animated Overlay ── */
+      .aurora-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      .aurora-bg::before,
+      .aurora-bg::after {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        border-radius: 50%;
+        animation: aurora-drift 12s ease-in-out infinite alternate;
+      }
+
+      .aurora-bg::before {
+        background: radial-gradient(
+          ellipse at 30% 40%,
+          rgba(0, 255, 255, 0.07) 0%,
+          transparent 60%
+        );
+      }
+
+      .aurora-bg::after {
+        background: radial-gradient(
+          ellipse at 70% 60%,
+          rgba(255, 0, 255, 0.06) 0%,
+          transparent 60%
+        );
+        animation-delay: -6s;
+        animation-direction: alternate-reverse;
+      }
+
+      @keyframes aurora-drift {
+        0% {
+          transform: translate(0, 0) rotate(0deg) scale(1);
+        }
+
+        33% {
+          transform: translate(5%, -3%) rotate(3deg) scale(1.05);
+        }
+
+        66% {
+          transform: translate(-3%, 5%) rotate(-2deg) scale(0.98);
+        }
+
+        100% {
+          transform: translate(2%, 2%) rotate(1deg) scale(1.02);
+        }
+      }
+
+      /* ── Floating Particles Canvas ── */
+      #particlesCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* ── Live Server Status LED ── */
+      .server-status-led {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        transition: all 0.4s ease;
+      }
+
+      .led-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #555;
+        box-shadow: 0 0 6px #555;
+        transition: all 0.4s ease;
+      }
+
+      .led-dot.idle {
+        background: #00ff88;
+        box-shadow:
+          0 0 8px #00ff88,
+          0 0 20px rgba(0, 255, 136, 0.4);
+      }
+
+      .led-dot.processing {
+        background: #ffaa00;
+        box-shadow:
+          0 0 8px #ffaa00,
+          0 0 20px rgba(255, 170, 0, 0.4);
+        animation: led-blink 0.8s infinite;
+      }
+
+      .led-dot.cooldown {
+        background: #ff4444;
+        box-shadow:
+          0 0 8px #ff4444,
+          0 0 20px rgba(255, 68, 68, 0.4);
+        animation: led-blink 1.5s infinite;
+      }
+
+      @keyframes led-blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* ── Ripple Effect on Button ── */
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: scale(0);
+        animation: ripple-expand 0.6s ease-out forwards;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      @keyframes ripple-expand {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* ── Neon Chase Input Border ── */
+      .input-glow-wrap {
+        position: relative;
+      }
+
+      .input-glow-wrap::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--primary-gradient);
+        border-radius: 2px;
+        transition: width 0.4s ease;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+      }
+
+      .input-glow-wrap.active::after {
+        width: 100%;
+      }
+
+      /* ── FOMO Toast (Live Unlock Ping) ── */
+      .fomo-toast {
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 0.82rem;
+        font-family: "Outfit", sans-serif;
+        color: #fff;
+        background: rgba(0, 255, 136, 0.12);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 255, 136, 0.35);
+        box-shadow:
+          0 0 25px rgba(0, 0, 0, 0.5),
+          0 0 10px rgba(0, 255, 136, 0.2);
+        animation: fomo-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        max-width: 320px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .fomo-toast.out {
+        animation: toast-out 0.3s ease forwards;
+      }
+
+      @keyframes fomo-in {
+        from {
+          opacity: 0;
+          transform: translateX(120px) scale(0.8);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateX(0) scale(1);
+        }
+      }
+
+      .main-wrapper {
+        width: 100%;
+        max-width: 480px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* The Neon Glass Container */
+      .container {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 2.5rem;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        box-shadow:
+          inset 0 0 20px rgba(255, 0, 255, 0.1),
+          0 25px 50px -12px rgba(0, 0, 0, 1),
+          var(--neon-glow);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+
+        /* Enable 3D Tilt Effect */
+        transform-style: preserve-3d;
+        transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+        transition:
+          transform 0.1s ease-out,
+          box-shadow 0.4s ease;
+      }
+
+      .container:hover {
+        box-shadow:
+          inset 0 0 30px rgba(0, 255, 255, 0.15),
+          0 25px 50px -12px rgba(0, 0, 0, 1),
+          0 0 30px rgba(0, 255, 255, 0.6),
+          0 0 60px rgba(255, 0, 255, 0.3);
+      }
+
+      /* Subtle Noise Overlay for Realism */
+      .container::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.05"/%3E%3C/svg%3E');
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.8;
+        mix-blend-mode: overlay;
+      }
+
+      .app-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 18px;
+        display: block;
+        margin: 0 auto 1rem;
+        object-fit: cover;
+        overflow: hidden;
+        box-shadow:
+          0 0 20px rgba(0, 255, 255, 0.5),
+          inset 0 0 10px rgba(255, 255, 255, 0.2);
+        position: relative;
+        z-index: 1;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        background-image: var(--primary-gradient);
+        padding: 2px;
+        animation: float 4s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+
+        50% {
+          transform: translateY(-10px);
+        }
+
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .app-icon img {
+        border-radius: 16px;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      h1 {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        position: relative;
+        z-index: 1;
+        text-transform: uppercase;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        animation: glitch-anim 4s infinite;
+      }
+
+      @keyframes glitch-anim {
+        0%,
+        94%,
+        98%,
+        100% {
+          transform: translate(0) skew(0deg);
+          opacity: 1;
+        }
+
+        95% {
+          transform: translate(-2px, 2px) skew(5deg);
+          opacity: 0.8;
+        }
+
+        96% {
+          transform: translate(2px, -2px) skew(-5deg);
+          opacity: 0.9;
+        }
+
+        97% {
+          transform: translate(0px, 0px) skew(0deg);
+          opacity: 1;
+          text-shadow:
+            -2px 0 red,
+            2px 0 cyan;
+        }
+      }
+
+      p.subtitle {
+        color: var(--primary-color);
+        margin-bottom: 2.5rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 1;
+        opacity: 0.8;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      }
+
+      .form-group {
+        margin-bottom: 2rem;
+        text-align: left;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Global Queue Status */
+      .global-queue-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        background: rgba(0, 255, 255, 0.03);
+        padding: 1.25rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.05);
+      }
+
+      .global-queue-item {
+        text-align: center;
+      }
+
+      .global-queue-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+      }
+
+      .global-queue-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        opacity: 0.9;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 1.2rem;
+        background-color: var(--input-bg);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 0.75rem;
+        color: #fff;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+        font-family: "Outfit", sans-serif;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.2);
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background-color: rgba(0, 255, 255, 0.05);
+        box-shadow:
+          inset 0 2px 10px rgba(0, 0, 0, 0.5),
+          0 0 15px rgba(0, 255, 255, 0.4),
+          0 0 30px rgba(0, 255, 255, 0.15);
+        transition: all 0.4s ease;
+      }
+
+      button {
+        width: 100%;
+        padding: 1.2rem;
+        background: var(--primary-gradient);
+        color: #000;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        box-shadow:
+          0 0 20px rgba(0, 255, 255, 0.4),
+          inset 0 0 10px rgba(255, 255, 255, 0.5);
+        animation: pulse-border 3s infinite alternate;
+      }
+
+      @keyframes pulse-border {
+        0% {
+          box-shadow:
+            0 0 20px rgba(0, 255, 255, 0.4),
+            inset 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        100% {
+          box-shadow:
+            0 0 35px rgba(255, 0, 255, 0.6),
+            inset 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+      }
+
+      button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        transition: all 0.5s ease;
+        z-index: -1;
+      }
+
+      button:hover {
+        transform: translateY(-3px) scale(1.02);
+        color: #fff;
+        text-shadow: 0 0 5px #000;
+      }
+
+      button:hover::before {
+        left: 100%;
+        transition: all 0.5s ease;
+      }
+
+      button:active,
+      .download-btn:active {
+        transform: translateY(1px);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        animation: none;
+        box-shadow: none;
+        transform: none;
+        color: #555;
+        background: #222;
+      }
+
+      /* Additional Container for Info / Instructions */
+      .instructions,
+      .note {
+        background: rgba(10, 10, 15, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 0, 255, 0.2);
+        text-align: left;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        transition: border-color 0.3s ease;
+      }
+
+      .instructions:hover,
+      .note:hover {
+        border-color: rgba(0, 255, 255, 0.4);
+      }
+
+      .platform-tabs {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .platform-tab {
+        flex: 1;
+        padding: 0.8rem 1rem;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+
+      .platform-tab:hover {
+        background: rgba(0, 255, 255, 0.1);
+        color: #fff;
+        border-color: rgba(0, 255, 255, 0.5);
+      }
+
+      .platform-tab.active {
+        background: var(--primary-gradient);
+        color: #000;
+        border-color: transparent;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      }
+
+      .platform-content {
+        display: none;
+        animation: fadeIn 0.4s ease forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .platform-content.active {
+        display: block;
+      }
+
+      .dns-hostname {
+        background: rgba(255, 0, 255, 0.1);
+        border: 1px dashed rgba(255, 0, 255, 0.4);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        font-family: "Courier New", monospace;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--secondary-color);
+        text-align: center;
+        margin: 1rem 0;
+        user-select: all;
+        text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+      }
+
+      .instructions h3,
+      .note h3 {
+        color: #fff;
+        font-size: 1.1rem;
+        margin-top: 0;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .instructions h3 svg {
+        color: var(--primary-color);
+        fill: rgba(0, 255, 255, 0.2);
+      }
+
+      .note h3 svg {
+        color: var(--secondary-color);
+        fill: rgba(255, 0, 255, 0.2);
+      }
+
+      .instructions ol,
+      .note ul {
+        padding-left: 1.5rem;
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .instructions li,
+      .note li {
+        margin-bottom: 0.75rem;
+      }
+
+      .instructions strong {
+        color: var(--primary-color);
+      }
+
+      .youtube-embed {
+        margin-top: 1.25rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        background: #000;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .youtube-embed iframe {
+        width: 100%;
+        aspect-ratio: 9 / 16;
+        border: 0;
+        display: block;
+      }
+
+      /* Download Profile Btn specifically */
+      .download-btn {
+        background: rgba(0, 255, 255, 0.1) !important;
+        border: 1px solid rgba(0, 255, 255, 0.3) !important;
+        color: var(--primary-color) !important;
+      }
+
+      .download-btn:hover {
+        background: rgba(0, 255, 255, 0.2) !important;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4) !important;
+        color: #fff !important;
+      }
+
+      /* Footer */
+      footer {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.85rem;
+        text-align: center;
+        width: 100%;
+      }
+
+      footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s;
+        font-weight: bold;
+        opacity: 0.7;
+      }
+
+      footer a:hover {
+        opacity: 1;
+        text-shadow: 0 0 10px var(--primary-color);
+      }
+
+      /* Loader */
+      .loader {
+        display: none;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+        border-radius: 50%;
+        border-top-color: #000;
+        animation: spin 0.8s ease-in-out infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* SweetAlert2 Neon Override */
+      div:where(.swal2-container) div:where(.swal2-popup) {
+        background: rgba(5, 5, 8, 0.9) !important;
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px) !important;
+        border: 1px solid rgba(255, 0, 255, 0.3) !important;
+        border-radius: 1rem !important;
+        box-shadow:
+          0 0 40px rgba(255, 0, 255, 0.2),
+          inset 0 0 20px rgba(0, 255, 255, 0.1) !important;
+      }
+
+      div:where(.swal2-container) h2:where(.swal2-title) {
+        color: #fff !important;
+        font-family: "Outfit", sans-serif !important;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 800 !important;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5) !important;
+      }
+
+      div:where(.swal2-container) .swal2-html-container {
+        font-family: "Outfit", sans-serif !important;
+        color: var(--text-secondary) !important;
+      }
+
+      /* User Info Card inside Swal */
+      .swal2-html-container .user-info-card {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        text-align: left;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+      }
+
+      .swal2-html-container .user-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        object-fit: cover;
+        border: 2px solid var(--primary-color);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+      }
+
+      .swal2-html-container .user-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.25rem;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+      }
+
+      .swal2-html-container .user-username {
+        font-size: 0.95rem;
+        color: var(--primary-color);
+        font-weight: 500;
+      }
+
+      .swal2-html-container .user-uid {
+        font-size: 0.8rem;
+        color: #aaa;
+        margin-top: 0.75rem;
+        word-break: break-all;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 6px 10px;
+        border-radius: 6px;
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Custom Buttons for Swal */
+      .glass-confirm-btn {
+        background: var(--primary-gradient) !important;
+        color: #000 !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        border-radius: 0.75rem !important;
+        padding: 14px 28px !important;
+        border: none !important;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4) !important;
+        font-family: "Outfit", sans-serif !important;
+        transition: all 0.3s ease !important;
+      }
+
+      .glass-confirm-btn:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 0 30px rgba(255, 0, 255, 0.6) !important;
+      }
+
+      .glass-cancel-btn {
+        background: rgba(0, 0, 0, 0.5) !important;
+        color: var(--text-secondary) !important;
+        border-radius: 0.75rem !important;
+        padding: 14px 28px !important;
+        border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+        font-family: "Outfit", sans-serif !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        margin-top: 12px !important;
+        transition: all 0.3s ease !important;
+      }
+
+      .glass-cancel-btn:hover {
+        color: #fff !important;
+        border-color: rgba(255, 0, 255, 0.5) !important;
+        background: rgba(255, 0, 255, 0.1) !important;
+      }
+
+      /* Queue Status Styles */
+      .queue-position {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        margin: 1.5rem 0;
+        animation:
+          text-pulse 2s ease-in-out infinite,
+          glitch 3s infinite;
+      }
+
+      .queue-stat {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+      }
+
+      .queue-stat-value {
+        color: var(--primary-color);
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      }
+
+      .queue-progress {
+        height: 12px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 0, 255, 0.2);
+        border-radius: 6px;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+      }
+
+      .queue-progress-bar {
+        background: var(--primary-gradient);
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+        border-radius: 4px;
+      }
+
+      @keyframes text-pulse {
+        0%,
+        100% {
+          opacity: 1;
+          filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+        }
+
+        50% {
+          opacity: 0.8;
+          filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.2));
+        }
+      }
+
+      /* ── Toast Notifications ── */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .toast {
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-family: "Outfit", sans-serif;
+        color: #fff;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        animation: toast-in 0.4s ease;
+        max-width: 320px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .toast.success {
+        background: rgba(0, 200, 100, 0.2);
+        border-color: rgba(0, 200, 100, 0.5);
+      }
+
+      .toast.error {
+        background: rgba(255, 50, 50, 0.2);
+        border-color: rgba(255, 50, 50, 0.5);
+      }
+
+      .toast.info {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.3);
+      }
+
+      .toast.out {
+        animation: toast-out 0.3s ease forwards;
+      }
+
+      @keyframes toast-in {
+        from {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes toast-out {
+        from {
+          opacity: 1;
+        }
+
+        to {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+      }
+
+      .lang-toggle {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 255, 255, 0.35);
+        border-radius: 20px;
+        padding: 7px 16px;
+        color: var(--primary-color);
+        font-family: "Outfit", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+        width: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        animation: none;
+        user-select: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      }
+
+      .lang-toggle:hover {
+        background: rgba(0, 255, 255, 0.15);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        border-color: rgba(0, 255, 255, 0.6);
+      }
+
+      /* ── Copy Button ── */
+      .copy-wrap {
+        position: relative;
+        cursor: pointer;
+      }
+
+      .copy-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 0, 255, 0.2);
+        border: 1px solid rgba(255, 0, 255, 0.4);
+        color: #fff;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 0.7rem;
+        font-family: "Outfit", sans-serif;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .copy-btn:hover {
+        background: rgba(255, 0, 255, 0.4);
+      }
+
+      /* ── Rate Limit Bar ── */
+      .rate-limit-bar {
+        margin-top: 1rem;
+      }
+
+      .rate-limit-label {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .rate-limit-track {
+        height: 6px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 255, 255, 0.15);
+      }
+
+      .rate-limit-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition:
+          width 0.5s,
+          background 0.5s;
+        background: var(--primary-color);
+      }
+
+      /* ── Activity Feed ── */
+      .activity-feed {
+        background: rgba(10, 10, 15, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .activity-feed h3 {
+        color: #fff;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .activity-feed h3 svg {
+        color: var(--primary-color);
+      }
+
+      .activity-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .activity-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.85rem;
+      }
+
+      .activity-item:last-child {
+        border: none;
+      }
+
+      .activity-user {
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      .activity-time {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .glass-report-btn {
+        background: rgba(255, 70, 70, 0.2) !important;
+        border: 1px solid rgba(255, 70, 70, 0.5) !important;
+        color: #ff6b6b !important;
+        font-weight: 600 !important;
+        border-radius: 0.75rem !important;
+        padding: 0.6rem 1.5rem !important;
+        font-family: "Outfit", sans-serif !important;
+        font-size: 0.85rem !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+      }
+
+      .glass-report-btn:hover {
+        background: rgba(255, 70, 70, 0.4) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      /* ── Hacker Overlay ── */
+      .hacker-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 999999;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        font-family: "Courier New", Courier, monospace;
+        color: #00ff00;
+      }
+
+      .hacker-terminal {
+        width: 90%;
+        max-width: 600px;
+        background: rgba(0, 20, 0, 0.8);
+        border: 1px solid #00ff00;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+        text-align: left;
+      }
+
+      .hacker-text {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 20px;
+        white-space: pre-wrap;
+        text-shadow: 0 0 5px #00ff00;
+      }
+
+      .hacker-progress-container {
+        width: 100%;
+        height: 20px;
+        border: 1px solid #00ff00;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #000;
+      }
+
+      .hacker-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: #00ff00;
+        transition: width 0.1s linear;
+        box-shadow: 0 0 15px #00ff00;
+      }
+
+      .cursor-blink {
+        animation: blink 1s step-end infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Aurora Background -->
+    <div class="aurora-bg"></div>
+    <!-- Floating Particles -->
+    <canvas id="particlesCanvas"></canvas>
+
+    <!-- Hacker Terminal Overlay -->
+    <div class="hacker-overlay" id="hackerOverlay">
+      <div class="hacker-terminal">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.5);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+          "
+        >
+          <span>root@locket-exploit:~# ./inject_gold.sh</span>
+          <span class="cursor-blink">_</span>
+        </div>
+        <div class="hacker-text" id="hackerText"></div>
+        <div
+          style="
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: rgba(0, 255, 0, 0.7);
+          "
+        >
+          PAYLOAD UPLOAD PROGRESS:
+        </div>
+        <div class="hacker-progress-container">
+          <div class="hacker-progress-bar" id="hackerProgressBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Server Status LED -->
+    <div class="server-status-led" id="serverLed">
+      <div class="led-dot" id="ledDot"></div>
+      <span id="ledLabel">CONNECTING...</span>
+    </div>
+
+    <style>
+      .layout-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px 10px;
+        position: relative;
+        z-index: 10;
+      }
+
+      .layout-left,
+      .layout-right,
+      .layout-center {
+        width: 100%;
+      }
+
+      .layout-left .main-wrapper,
+      .layout-right .main-wrapper,
+      .layout-center .main-wrapper {
+        margin: 0 auto;
+      }
+
+      @media (min-width: 1100px) {
+        .layout-grid {
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: center;
+          padding: 40px 20px;
+        }
+
+        .layout-left {
+          flex: 1;
+          max-width: 480px;
+          order: 1;
+        }
+
+        .layout-center {
+          flex: 0 1 520px;
+          order: 2;
+        }
+
+        .layout-right {
+          flex: 1;
+          max-width: 480px;
+          order: 3;
+        }
+
+        .layout-grid > div > .main-wrapper {
+          margin: 0;
+          /* Reset default vertical margins */
+        }
+      }
+    </style>
+
+    <div class="layout-grid">
+      <!-- 2. Hoạt Động Gần Đây (Trái) -->
+      <div class="layout-left">
+        <div class="main-wrapper">
+          <div class="activity-feed">
+            <h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              <span data-i18n="recentUnlocks">Recent Unlocks</span>
+            </h3>
+            <ul class="activity-list" id="activityFeed">
+              <li class="activity-item" style="color: var(--text-secondary)">
+                No activity yet
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khung Chính (Giữa) -->
+      <div class="layout-center">
+        <div class="main-wrapper">
+          <!-- Announcement Banner (dynamic from admin) -->
+          <div
+            id="announcementBanner"
+            style="
+              display: none;
+              width: 100%;
+              max-width: 520px;
+              margin: 0 auto 1rem;
+              padding: 0.8rem 1.2rem;
+              background: rgba(255, 200, 0, 0.1);
+              border: 1px solid rgba(255, 200, 0, 0.3);
+              border-radius: 0.75rem;
+              text-align: center;
+              color: #ffcc00;
+              font-size: 0.9rem;
+              backdrop-filter: blur(10px);
+            "
+          >
+            <span id="announcementText"></span>
+          </div>
+
+          <div class="container">
+            <img
+              src="https://play-lh.googleusercontent.com/eRZLg00mAQGayCrFjDBklPIpW3qFHcmUs8PUQA4z7hVe-cDKMcRqecVHONAIexJGJZM"
+              alt="Locket Icon"
+              class="app-icon"
+            />
+            <h1 data-i18n="title">Locket Gold</h1>
+            <p class="subtitle" data-i18n="subtitle">
+              Unlock premium features instantly
+            </p>
+
+            <div class="form-group">
+              <label for="username" data-i18n="targetUsername"
+                >Target Username</label
+              >
+              <div class="input-glow-wrap" id="inputGlowWrap">
+                <input
+                  type="text"
+                  id="username"
+                  data-i18n="placeholder"
+                  placeholder="Enter Locket username..."
+                  required
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+
+            <button id="submitBtn" onclick="unlockGold()">
+              <span class="btn-text" data-i18n="unlockBtn"
+                >Unlock Locket Gold</span
+              >
+              <div class="loader" id="loader"></div>
+            </button>
+
+            <a
+              href="https://t.me/WhoisCatee"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                margin-top: 0.8rem;
+                padding: 0.5rem 1.2rem;
+                background: rgba(255, 70, 70, 0.1);
+                border: 1px solid rgba(255, 70, 70, 0.3);
+                border-radius: 0.75rem;
+                color: #ff6b6b;
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: all 0.2s;
+              "
+              onmouseover="
+                this.style.background = 'rgba(255,70,70,0.25)';
+                this.style.transform = 'translateY(-1px)';
+              "
+              onmouseout="
+                this.style.background = 'rgba(255,70,70,0.1)';
+                this.style.transform = 'none';
+              "
+            >
+              📩 <span data-i18n="reportError">Báo Lỗi</span>
+            </a>
+          </div>
+
+          <div class="instructions">
+            <h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span data-i18n="howToUse">How to use</span>
+            </h3>
+
+            <!-- Platform Tabs -->
+
+            <!-- iOS Content -->
+            <div id="ios-content" class="platform-content active">
+              <ol>
+                <li data-i18n="ios1">
+                  Open the Locket app and find your username in settings.
+                </li>
+                <li data-i18n="ios2">
+                  Enter your exact username in the field above.
+                </li>
+                <li data-i18n="ios3">
+                  Click <strong>Unlock Locket Gold</strong> to activate premium.
+                </li>
+                <li data-i18n="ios4">
+                  <strong>Important:</strong> After activation, you must install
+                  the configuration profile below to block revocation.
+                </li>
+                <li data-i18n="ios5">
+                  Restart your Locket app to see the changes.
+                </li>
+              </ol>
+              <div
+                style="
+                  margin-top: 1rem;
+                  display: flex;
+                  gap: 10px;
+                  justify-content: center;
+                  flex-wrap: wrap;
+                "
+              >
+                <a
+                  href="{{ url_for('download_profile') }}"
+                  class="download-btn"
+                  rel="noopener noreferrer"
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    background: rgba(255, 255, 255, 0.1);
+                    color: #fff;
+                    padding: 0.8rem 1.5rem;
+                    border-radius: 0.75rem;
+                    text-decoration: none;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    font-family: &quot;Outfit&quot;, sans-serif;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    transition: all 0.3s ease;
+                  "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 8px"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span data-i18n="downloadProfile">Download Profile</span>
+                </a>
+
+                <button
+                  onclick="showTutorial()"
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    width: auto;
+                    background: rgba(255, 215, 0, 0.1);
+                    color: #ffd700;
+                    padding: 0.8rem 1.5rem;
+                    border-radius: 0.75rem;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    font-family: &quot;Outfit&quot;, sans-serif;
+                    cursor: pointer;
+                    border: 1px solid rgba(255, 215, 0, 0.2);
+                    transition: all 0.3s ease;
+                  "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 8px"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                  </svg>
+                  <span data-i18n="watchTutorial">Watch Tutorial</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Android Content removed -->
+          </div>
+
+          <div class="note">
+            <h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                ></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <span data-i18n="importantNote">Important Note</span>
+            </h3>
+            <ul>
+              <li data-i18n="iosCompat">
+                This tool is compatible with <strong>iOS Devices</strong>.
+              </li>
+              <li data-i18n="goldValid">
+                The Gold subscription is only valid until you
+                <strong>log out</strong> of the Locket app.
+              </li>
+              <li data-i18n="eduOnly">
+                This project is created for
+                <strong>educational purposes only</strong>.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. QR Donate (Phải) -->
+      <div class="layout-right">
+        <!-- QR Donate Section (dynamic from admin) -->
+        <div class="main-wrapper" id="qrDonateSection" style="display: none">
+          <div
+            style="
+              max-width: 520px;
+              margin: 0 auto;
+              background: rgba(10, 10, 15, 0.4);
+              backdrop-filter: blur(15px);
+              border: 1px solid rgba(0, 255, 255, 0.15);
+              border-radius: 1.5rem;
+              padding: 2rem;
+              text-align: center;
+            "
+          >
+            <h3
+              style="
+                font-size: 1rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                color: var(--text-secondary);
+                margin-bottom: 1rem;
+              "
+            >
+              ❤️ <span data-i18n="donateTitle">Donate</span>
+            </h3>
+            <img
+              id="qrDonateImg"
+              src=""
+              alt="QR Donate"
+              style="
+                max-width: 280px;
+                width: 100%;
+                border-radius: 1rem;
+                border: 1px solid rgba(0, 255, 255, 0.15);
+              "
+            />
+            <p
+              style="
+                margin-top: 0.8rem;
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+              "
+              data-i18n="donateDesc"
+            >
+              Scan QR to support us
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Language Toggle -->
+    <div class="lang-toggle" id="langToggle" onclick="toggleLang()">🌐 EN</div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <footer>
+      <p>
+        <span data-i18n="createdBy">Created with ❤️ by</span>
+        <a href="https://t.me/WhoisCatee" target="_blank">Nguyễn Xuân Tùng</a>
+      </p>
+    </footer>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      // Platform switching function
+      function switchPlatform(platform) {
+        // Update tabs
+        document.querySelectorAll(".platform-tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        event.target.closest(".platform-tab").classList.add("active");
+
+        // Update content
+        document.querySelectorAll(".platform-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+        document.getElementById(platform + "-content").classList.add("active");
+      }
+
+      function showTutorial() {
+        Swal.fire({
+          title: t("howToInstallTitle"),
+          html: `
+                    <div style="
+                        border-radius: 1rem;
+                        overflow: hidden;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        background: rgba(0, 0, 0, 0.2);
+                    ">
+                        <iframe src="https://www.youtube.com/embed/DVEkn_AZd4w?autoplay=1" title="YouTube video player"
+                            style="width: 100%; aspect-ratio: 9/16; border: 0; display: block;"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                `,
+          ...swalGlassParams,
+          showConfirmButton: false,
+          showCloseButton: true,
+          width: 400,
+          padding: "1.5rem",
+        });
+      }
+
+      let currentUserData = null;
+
+      const swalGlassParams = {
+        background: "transparent", // Handled by CSS
+        customClass: {
+          popup: "glass-popup",
+          confirmButton: "glass-confirm-btn",
+          cancelButton: "glass-cancel-btn",
+        },
+        buttonsStyling: false,
+      };
+
+      async function unlockGold() {
+        const usernameInput = document.getElementById("username");
+        const username = usernameInput.value.trim();
+        const btn = document.getElementById("submitBtn");
+        const loader = document.getElementById("loader");
+        const btnText = document.querySelector(".btn-text");
+
+        if (!username) {
+          Swal.fire({
+            icon: "warning",
+            title: t("missingInputTitle"),
+            text: t("missingInputText"),
+            ...swalGlassParams,
+            confirmButtonText: t("ok"),
+          });
+          return;
+        }
+
+        // Loading state
+        btn.disabled = true;
+        loader.style.display = "block";
+        btnText.style.display = "none";
+
+        // Show Hacker Overlay Fake Loading
+        const hackerOverlay = document.getElementById("hackerOverlay");
+        const hackerText = document.getElementById("hackerText");
+        const hackerProgressBar = document.getElementById("hackerProgressBar");
+
+        if (hackerOverlay) {
+          hackerOverlay.style.display = "flex";
+          hackerText.innerHTML = "";
+          hackerProgressBar.style.width = "0%";
+
+          const lines = [
+            "> Initializing Locket Gold protocol bypass...",
+            "> Establishing secure connection to target server...",
+            "> Translating user ID for: @" + username + "...",
+            "> Target validated. Calculating memory offset...",
+            "> Injecting premium token payload...",
+            "> Waiting for server-side cryptographic validation...",
+            "> Bypassing security checks... (2/3)",
+          ];
+
+          for (let i = 0; i < lines.length; i++) {
+            // Random delay between 300ms and 700ms simulating processing
+            await new Promise((r) => setTimeout(r, 300 + Math.random() * 400));
+            hackerText.innerHTML += lines[i] + "\n";
+            hackerProgressBar.style.width =
+              ((i + 1) / lines.length) * 100 + "%";
+          }
+
+          await new Promise((r) => setTimeout(r, 600));
+          hackerText.innerHTML +=
+            "> Payload injected successfully. Preparing connection lock... <span class='cursor-blink'>█</span>";
+          await new Promise((r) => setTimeout(r, 800));
+
+          // Hide overlay and show normal SWAL loading
+          hackerOverlay.style.display = "none";
+        }
+
+        // Show loading modal
+        Swal.fire({
+          title: t("unlockingTitle"),
+          html: `<div style="text-align:center; padding: 20px;">
+                        <div class="loader" style="display:inline-block; width: 40px; height: 40px; border-width: 4px; margin-bottom: 20px;"></div>
+                        <div id="swalQueueMsg">${t("unlockingText").replace("{user}", username)}</div>
+                       </div>`,
+          ...swalGlassParams,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        });
+
+        // Auto-retry logic for queue serialization
+        const MAX_RETRIES = 30; // max 90 seconds (30 * 3s)
+        let retryCount = 0;
+
+        async function attemptRestore() {
+          try {
+            const response = await fetch("/api/restore", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: username }),
+            });
+
+            const data = await response.json();
+
+            // Server is busy — auto-retry
+            if (response.status === 429 && data.busy) {
+              retryCount++;
+              if (retryCount >= MAX_RETRIES) {
+                Swal.fire({
+                  icon: "error",
+                  title: t("errorTitle"),
+                  text: t("queueTimeoutText"),
+                  ...swalGlassParams,
+                  confirmButtonText: t("close"),
+                });
+                resetBtn();
+                return;
+              }
+
+              // Update the modal to show queue status
+              const msgEl = document.getElementById("swalQueueMsg");
+              if (msgEl) {
+                msgEl.innerHTML = `${t("queueWaitingText")}<br><span style="font-size:.8rem; color:var(--text-secondary); margin-top:8px; display:inline-block;">${t("queueRetryText").replace("{n}", retryCount)}</span>`;
+              }
+
+              // Wait 3 seconds and retry
+              setTimeout(attemptRestore, 3000);
+              return;
+            }
+
+            // Success
+            if (response.ok && data.success) {
+              showCompletedStatus(data);
+            } else {
+              let errorText = data.msg;
+              if (
+                errorText === "User not found or API error" ||
+                errorText === "User data not found"
+              ) {
+                errorText = t("userNotFoundText");
+              } else if (errorText === "Username is required") {
+                errorText = t("missingInputText");
+              }
+              Swal.fire({
+                icon: "error",
+                title: t("errorTitle"),
+                text:
+                  errorText || t("restoreFailText").replace("{msg}", data.msg),
+                ...swalGlassParams,
+                confirmButtonText: t("close"),
+                showDenyButton: true,
+                denyButtonText: t("reportError"),
+                customClass: {
+                  ...swalGlassParams.customClass,
+                  denyButton: "glass-report-btn",
+                },
+              }).then((result) => {
+                if (result.isDenied)
+                  window.open("https://t.me/WhoisCatee", "_blank");
+              });
+            }
+            resetBtn();
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: t("connectionErrorTitle"),
+              text: t("connectionErrorText"),
+              ...swalGlassParams,
+              confirmButtonText: t("close"),
+              showDenyButton: true,
+              denyButtonText: t("reportError"),
+              customClass: {
+                ...swalGlassParams.customClass,
+                denyButton: "glass-report-btn",
+              },
+            }).then((result) => {
+              if (result.isDenied)
+                window.open("https://t.me/WhoisCatee", "_blank");
+            });
+            resetBtn();
+          }
+        }
+
+        function resetBtn() {
+          btn.disabled = false;
+          loader.style.display = "none";
+          btnText.style.display = "inline-block";
+        }
+
+        // Start the first attempt
+        attemptRestore();
+      }
+
+      async function checkUserInfo() {
+        const usernameInput = document.getElementById("username");
+        const username = usernameInput.value.trim();
+        const btn = document.getElementById("submitBtn");
+        const loader = document.getElementById("loader");
+        const btnText = document.querySelector(".btn-text");
+
+        if (!username) {
+          Swal.fire({
+            icon: "warning",
+            title: t("missingInputTitle"),
+            text: t("missingInputText"),
+            ...swalGlassParams,
+            confirmButtonText: t("ok"),
+          });
+          return;
+        }
+
+        // Loading state
+        btn.disabled = true;
+        loader.style.display = "block";
+        btnText.style.display = "none";
+
+        try {
+          const response = await fetch("/api/get-user-info", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: username,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            currentUserData = data.data;
+            showUserInfoConfirmation(data.data);
+          } else {
+            let errorText = data.msg;
+            if (
+              errorText === "User not found or API error" ||
+              errorText === "User data not found"
+            ) {
+              errorText = t("userNotFoundText");
+            } else if (errorText === "Username is required") {
+              errorText = t("missingInputText");
+            }
+            Swal.fire({
+              icon: "error",
+              title: t("userNotFoundTitle"),
+              text: errorText || t("userNotFoundText"),
+              ...swalGlassParams,
+              confirmButtonText: t("close"),
+            });
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          Swal.fire({
+            icon: "error",
+            title: t("connectionErrorTitle"),
+            text: t("connectionErrorText"),
+            ...swalGlassParams,
+            confirmButtonText: t("close"),
+          });
+        } finally {
+          // Reset state
+          btn.disabled = false;
+          loader.style.display = "none";
+          btnText.style.display = "inline-block";
+        }
+      }
+
+      function showUserInfoConfirmation(userData) {
+        const fullName =
+          `${userData.first_name || ""} ${userData.last_name || ""}`.trim() ||
+          t("noName");
+        const avatarUrl =
+          userData.profile_picture_url ||
+          "https://play-lh.googleusercontent.com/eRZLg00mAQGayCrFjDBklPIpW3qFHcmUs8PUQA4z7hVe-cDKMcRqecVHONAIexJGJZM";
+
+        Swal.fire({
+          title: t("userInfoTitle"),
+          html: `
+                <div class="user-info-card">
+                    <div class="user-info-header">
+                        <img src="${avatarUrl}" alt="Avatar" class="user-avatar" onerror="this.src='https://play-lh.googleusercontent.com/eRZLg00mAQGayCrFjDBklPIpW3qFHcmUs8PUQA4z7hVe-cDKMcRqecVHONAIexJGJZM'">
+                        <div class="user-details">
+                            <div class="user-name">${fullName}</div>
+                            <div class="user-username">@${userData.username}</div>
+                        </div>
+                    </div>
+                    <div class="user-uid">UID: ${userData.uid}</div>
+                </div>
+                <p style="margin-top: 1rem; color: #a0a0a0; font-size: 0.9rem;">
+                    ${t("unlockConfirm")}
+                </p>
+            `,
+          ...swalGlassParams,
+          showCancelButton: true,
+          confirmButtonText: t("continueBtn"),
+          cancelButtonText: t("cancelBtn"),
+        }).then((result) => {
+          if (result.isConfirmed) {
+            unlockGold(); // Call the new unlockGold function
+          }
+        });
+      }
+
+      function showCompletedStatus(data) {
+        if (data.success) {
+          // Check data.success directly
+          let successText = data.msg;
+
+          // Intercept backend English success message
+          // Format: Purchase locket_199_1m for username successfully!
+          const match = successText.match(
+            /Purchase (.*) for (.*) successfully!/i,
+          );
+          if (match) {
+            successText = t("purchaseSuccess")
+              .replace("{product}", match[1])
+              .replace("{user}", match[2]);
+          }
+
+          Swal.fire({
+            icon: "success",
+            title: t("successTitle"),
+            text: successText,
+            ...swalGlassParams,
+            confirmButtonText: t("coolBtn"),
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: t("failedTitle"),
+            text: t("reqFailedText"),
+            ...swalGlassParams,
+            confirmButtonText: t("close"),
+          });
+        }
+      }
+
+      // Allow pressing Enter to submit
+      document
+        .getElementById("username")
+        .addEventListener("keyup", function (event) {
+          if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById("submitBtn").click();
+          }
+        });
+
+      // ── Toast Notification System ──
+      function showToast(message, type = "info", duration = 3000) {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.classList.add("out");
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
+      }
+
+      // ── Copy to Clipboard ──
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".dns-hostname").forEach((el) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "copy-wrap";
+          el.parentNode.insertBefore(wrapper, el);
+          wrapper.appendChild(el);
+          const btn = document.createElement("button");
+          btn.className = "copy-btn";
+          btn.textContent = t("copyBtn");
+          btn.type = "button";
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+              showToast(t("copied"), "success");
+              btn.textContent = "✓";
+              setTimeout(() => (btn.textContent = t("copyBtn")), 2000);
+            });
+          };
+          wrapper.appendChild(btn);
+        });
+      });
+
+      // ── i18n System ──
+      let currentLang = localStorage.getItem("lang") || "en";
+      const i18n = {
+        en: {
+          title: "LOCKET GOLD",
+          subtitle: "UNLOCK PREMIUM FEATURES INSTANTLY",
+          targetUsername: "Target Username",
+          placeholder: "Enter Locket username...",
+          unlockBtn: "Unlock Locket Gold",
+          howToUse: "How to Use",
+          ios: "iOS",
+          android: "Android",
+          importantNote: "Important Note",
+          iosCompat:
+            "This tool is compatible with <strong>iOS and Android Devices</strong>.",
+          goldValid:
+            "The Gold subscription is only valid until you <strong>log out</strong> of the Locket app.",
+          eduOnly:
+            "This project is created for <strong>educational purposes only</strong>.",
+          recentUnlocks: "Recent Unlocks",
+          noActivity: "No activity yet",
+          copied: "Copied to clipboard!",
+          downloadProfile: "Download Profile",
+          watchTutorial: "Watch Tutorial",
+          createdBy: "Created with ❤️ by",
+          missingInputTitle: "Missing Input",
+          missingInputText: "Please enter a valid Locket username!",
+          ok: "OK",
+          userNotFoundTitle: "User Not Found",
+          userNotFoundText: "Could not find user with this username",
+          close: "Close",
+          connectionErrorTitle: "Connection Error",
+          connectionErrorText:
+            "Failed to connect to the server. Please check your internet.",
+          errorTitle: "Error",
+          unlockingTitle: "Unlocking",
+          unlockingText: "Unlocking Gold for {user}...",
+          successTitle: "Success!",
+          coolBtn: "Cool!",
+          failedTitle: "Failed",
+          reqFailedText: "Request completed but failed",
+          reqErrorText: "An error occurred while processing your request",
+          howToInstallTitle: "How to Install",
+          purchaseSuccess: "{product} unlocked successfully for {user}!",
+          copyBtn: "COPY",
+          restoreFailText: "Unlock failed: {msg}",
+          reportError: "📩 Report Error",
+          noName: "No Name",
+          userInfoTitle: "User Information",
+          unlockConfirm: "Do you want to unlock Gold for this user?",
+          continueBtn: "Continue",
+          cancelBtn: "Cancel",
+          ios1: "Open the Locket app and find your username in settings.",
+          ios2: "Enter your exact username in the field above.",
+          ios3: "Click <strong>Unlock Locket Gold</strong> to activate premium.",
+          ios4: "<strong>Important:</strong> After activation, you must install the configuration profile below to block revocation.",
+          ios5: "Restart your Locket app to see the changes.",
+          and1: "Open the Locket app and find your username in Settings.",
+          and2: "Enter your exact username in the field above.",
+          and3: "Click <strong>Unlock Locket Gold</strong> to activate premium.",
+          and4: "Go to <strong>Settings → Network & Internet</strong> on your Android device.",
+          and5: "Tap <strong>Private DNS</strong>.",
+          and6: "Select <strong>Private DNS provider hostname</strong>.",
+          and7: "Enter the following hostname:",
+          and8: "Tap <strong>Save</strong>.",
+          and9: "Restart your Locket app to see the changes.",
+          queueWaitingText:
+            "Server is processing another request. Waiting in queue...",
+          queueRetryText: "Auto-retry attempt #{n}",
+          queueTimeoutText:
+            "Queue timeout — server is too busy. Please try again later.",
+        },
+        vi: {
+          title: "LOCKET GOLD",
+          subtitle: "MỞ KHÓA TÍNH NĂNG PREMIUM TỨC THÌ",
+          targetUsername: "Tên Người Dùng (Username)",
+          placeholder: "Nhập username Locket...",
+          unlockBtn: "Mở khóa Locket Gold",
+          howToUse: "Hướng Dẫn Sử Dụng",
+          ios: "iOS",
+          android: "Android",
+          importantNote: "Lưu Ý Quan Trọng",
+          iosCompat:
+            "Công cụ này tương thích với <strong>thiết bị iOS và Android</strong>.",
+          goldValid:
+            "Gói Gold chỉ có hiệu lực cho đến khi bạn <strong>đăng xuất</strong> khỏi Locket.",
+          eduOnly:
+            "Dự án này được tạo ra <strong>chỉ nhằm mục đích giáo dục</strong>.",
+          recentUnlocks: "Mới Mở Khóa",
+          noActivity: "Chưa có hoạt động",
+          copied: "Đã sao chép!",
+          downloadProfile: "Tải Profile",
+          watchTutorial: "Xem Hướng Dẫn",
+          createdBy: "Tạo ra với ❤️ bởi",
+          missingInputTitle: "Thiếu Thông Tin",
+          missingInputText: "Vui lòng nhập tên người dùng Locket hợp lệ!",
+          ok: "OK",
+          userNotFoundTitle: "Không Tìm Thấy",
+          userNotFoundText: "Không thể tìm thấy người dùng với tên này",
+          close: "Đóng",
+          connectionErrorTitle: "Lỗi Kết Nối",
+          connectionErrorText:
+            "Lỗi kết nối đến máy chủ. Vui lòng kiểm tra mạng.",
+          errorTitle: "Lỗi",
+          unlockingTitle: "Đang Mở Khóa",
+          unlockingText: "Đang mở khóa Gold cho {user}...",
+          successTitle: "Thành Công!",
+          coolBtn: "Tuyệt!",
+          failedTitle: "Thất Bại",
+          reqFailedText: "Yêu cầu đã hoàn tất nhưng thất bại",
+          reqErrorText: "Đã xảy ra lỗi khi xử lý yêu cầu của bạn",
+          howToInstallTitle: "Hướng Dẫn Cài Đặt",
+          purchaseSuccess: "Đã mở khóa {product} cho {user} thành công!",
+          copyBtn: "SAO CHÉP",
+          restoreFailText: "Lỗi khi mở khóa: {msg}",
+          reportError: "📩 Báo Lỗi",
+          noName: "Chưa có tên",
+          userInfoTitle: "Thông Tin Người Dùng",
+          unlockConfirm: "Bạn có muốn mở khóa Gold cho người dùng này không?",
+          continueBtn: "Tiếp Tục",
+          cancelBtn: "Hủy",
+          ios1: "Mở ứng dụng Locket và tìm tên người dùng trong cài đặt.",
+          ios2: "Nhập chính xác tên người dùng vào ô trống bên trên.",
+          ios3: "Nhấn <strong>Mở khóa Locket Gold</strong> để kích hoạt premium.",
+          ios4: "<strong>Quan trọng:</strong> Sau khi kích hoạt, bạn phải cài đặt profile cấu hình bên dưới để chặn thu hồi chứng chỉ.",
+          ios5: "Khởi động lại Locket và tận hưởng.",
+          and1: "Mở ứng dụng Locket và tìm tên người dùng trong cài đặt.",
+          and2: "Nhập chính xác tên người dùng vào ô trống bên trên.",
+          and3: "Nhấn <strong>Mở khóa Locket Gold</strong> để kích hoạt premium.",
+          and4: "Vào phần <strong>Cài đặt → Mạng & Internet</strong> trên thiết bị Android của bạn.",
+          and5: "Nhấn vào <strong>DNS Cá nhân (Private DNS)</strong>.",
+          and6: "Chọn <strong>Tên máy chủ của nhà cung cấp DNS Cá nhân</strong>.",
+          and7: "Nhập tên máy chủ sau đây:",
+          and8: "Nhấn <strong>Lưu</strong>.",
+          and9: "Khởi động lại Locket và tận hưởng.",
+          queueWaitingText:
+            "Hệ thống đang xử lý yêu cầu khác. Đang chờ trong hàng đợi...",
+          queueRetryText: "Tự động thử lại lần #{n}",
+          queueTimeoutText:
+            "Hết thời gian chờ — hệ thống quá tải. Vui lòng thử lại sau.",
+          donateTitle: "Ủng Hộ",
+          donateDesc: "Quét mã QR để ủng hộ",
+        },
+      };
+
+      function t(key) {
+        return i18n[currentLang][key] || key;
+      }
+
+      function applyLang() {
+        const lang = i18n[currentLang];
+        document.getElementById("langToggle").textContent =
+          "🌐 " + currentLang.toUpperCase();
+        // Apply translations to data-i18n elements
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (lang[key]) {
+            if (el.tagName === "INPUT") el.placeholder = lang[key];
+            else el.innerHTML = lang[key];
+          }
+        });
+        // Update copy buttons
+        document.querySelectorAll(".copy-btn").forEach((btn) => {
+          if (btn.textContent !== "✓") {
+            btn.textContent = t("copyBtn");
+          }
+        });
+      }
+
+      function toggleLang() {
+        currentLang = currentLang === "en" ? "vi" : "en";
+        localStorage.setItem("lang", currentLang);
+        applyLang();
+        showToast(
+          currentLang === "vi"
+            ? "Đã chuyển sang Tiếng Việt"
+            : "Switched to English",
+          "info",
+        );
+      }
+
+      // ── Activity Feed ──
+      async function fetchActivityFeed() {
+        try {
+          const res = await fetch("/api/recent-activity");
+          const data = await res.json();
+          const list = document.getElementById("activityFeed");
+          if (!list) return;
+          if (!data.success || !data.activity || data.activity.length === 0) {
+            list.innerHTML = `<li class="activity-item" style="color:var(--text-secondary)">${t("noActivity")}</li>`;
+            return;
+          }
+          list.innerHTML = data.activity
+            .map((a) => {
+              const time = new Date(a.timestamp);
+              const timeStr = time.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+              return `<li class="activity-item"><span class="activity-user">@${a.username}</span><span class="activity-time">${timeStr}</span></li>`;
+            })
+            .join("");
+        } catch (e) {
+          console.error("Activity error:", e);
+        }
+      }
+
+      // ── Rate Limit ──
+      async function fetchRateLimit() {
+        try {
+          const res = await fetch("/api/rate-limit");
+          const data = await res.json();
+          // update rate limit bar if it exists
+          const fill = document.getElementById("rateLimitFill");
+          const label = document.getElementById("rateLimitValue");
+          if (!fill || !label) return;
+          if (!data.success || data.remaining === null) {
+            label.textContent = "OK";
+            fill.style.width = "100%";
+            return;
+          }
+          const pct =
+            data.limit > 0
+              ? Math.round((data.remaining / data.limit) * 100)
+              : 100;
+          label.textContent = `${data.remaining}/${data.limit}`;
+          fill.style.width = pct + "%";
+          if (pct > 60) fill.style.background = "#00ffaa";
+          else if (pct > 30) fill.style.background = "#ffaa00";
+          else fill.style.background = "#ff4444";
+        } catch (e) {
+          console.error("Rate limit error:", e);
+        }
+      }
+
+      // ── PWA Service Worker Registration ──
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/static/sw.js")
+          .then(() => console.log("SW registered"))
+          .catch((e) => console.log("SW fail:", e));
+      }
+
+      // ── Fetch Site Settings (from admin panel) ──
+      let welcomeShownThisSession = false;
+
+      async function fetchSiteSettings() {
+        try {
+          const res = await fetch("/api/site-settings");
+          const data = await res.json();
+          if (!data.success) return;
+
+          // Announcement banner
+          const banner = document.getElementById("announcementBanner");
+          const bannerText = document.getElementById("announcementText");
+          if (data.announcement && data.announcement.trim()) {
+            bannerText.textContent = data.announcement;
+            banner.style.display = "block";
+          } else {
+            banner.style.display = "none";
+          }
+
+          // Maintenance mode
+          const btn = document.getElementById("submitBtn");
+          const btnText = document.querySelector(".btn-text");
+          if (data.maintenance_mode) {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            btn.style.cursor = "not-allowed";
+            btnText.textContent =
+              currentLang === "vi" ? "🔧 Đang Bảo Trì" : "🔧 Under Maintenance";
+          }
+
+          // Dynamic DNS hostname
+          if (data.dns_hostname) {
+            const dnsEl = document.getElementById("dnsHostnameDisplay");
+            if (dnsEl) dnsEl.textContent = data.dns_hostname;
+          }
+
+          // QR Donate
+          const qrSection = document.getElementById("qrDonateSection");
+          const qrImg = document.getElementById("qrDonateImg");
+          if (data.qr_donate_url && data.qr_donate_url.trim()) {
+            qrImg.src = data.qr_donate_url;
+            qrSection.style.display = "block";
+          } else {
+            qrSection.style.display = "none";
+          }
+
+          // Welcome popup (once per page load)
+          if (
+            data.welcome_popup &&
+            data.welcome_popup.trim() &&
+            !welcomeShownThisSession
+          ) {
+            welcomeShownThisSession = true;
+
+            const swalConfig = {
+              icon: "info",
+              title: currentLang === "vi" ? "👋 Chào Mừng!" : "👋 Welcome!",
+              html: `<div style="white-space:pre-wrap; text-align:left; line-height:1.6;">${data.welcome_popup}</div>`,
+              ...swalGlassParams,
+              confirmButtonText: currentLang === "vi" ? "Đã Hiểu" : "Got It",
+            };
+
+            if (data.telegram_group_link && data.telegram_group_link.trim()) {
+              swalConfig.showCancelButton = true;
+              swalConfig.cancelButtonText =
+                currentLang === "vi"
+                  ? "Tham gia Nhóm Telegram"
+                  : "Join Telegram Group";
+              // Switch buttons position: Telegram on right, Got it on left (optional, or rely on reverseButtons)
+              swalConfig.reverseButtons = true;
+            }
+
+            Swal.fire(swalConfig).then((result) => {
+              if (
+                result.dismiss === Swal.DismissReason.cancel &&
+                data.telegram_group_link
+              ) {
+                window.open(data.telegram_group_link, "_blank");
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Site settings error:", e);
+        }
+      }
+
+      // ══════════════════════════════════════════════
+      // ██  MODULE 1: FLOATING PARTICLES ENGINE  ██
+      // ══════════════════════════════════════════════
+      function initParticles() {
+        const canvas = document.getElementById("particlesCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+        const PARTICLE_COUNT = 35;
+
+        // Interactive mouse tracking
+        let mouse = { x: null, y: null, radius: 100 };
+        window.addEventListener("mousemove", function (e) {
+          mouse.x = e.x;
+          mouse.y = e.y;
+        });
+        window.addEventListener("mouseout", function () {
+          mouse.x = null;
+          mouse.y = null;
+        });
+
+        function resize() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        class Particle {
+          constructor() {
+            this.reset();
+          }
+          reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2.5 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.4;
+            this.speedY = (Math.random() - 0.5) * 0.3;
+            this.opacity = Math.random() * 0.4 + 0.1;
+            this.hue = Math.random() > 0.5 ? 180 : 300; // Cyan or Magenta
+          }
+          update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.opacity += (Math.random() - 0.5) * 0.01;
+            this.opacity = Math.max(0.05, Math.min(0.5, this.opacity));
+            if (
+              this.x < -10 ||
+              this.x > canvas.width + 10 ||
+              this.y < -10 ||
+              this.y > canvas.height + 10
+            )
+              this.reset();
+
+            // Mouse Interaction
+            if (mouse.x != null && mouse.y != null) {
+              let dx = mouse.x - this.x;
+              let dy = mouse.y - this.y;
+              let distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance < mouse.radius) {
+                const forceDirectionX = dx / distance;
+                const forceDirectionY = dy / distance;
+                const force = (mouse.radius - distance) / mouse.radius;
+                const maxDist = 3; // repel intensity
+                this.x -= forceDirectionX * force * maxDist;
+                this.y -= forceDirectionY * force * maxDist;
+              }
+            }
+          }
+          draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${this.opacity})`;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = `hsla(${this.hue}, 100%, 70%, 0.3)`;
+            ctx.fill();
+          }
+        }
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          particles.forEach((p) => {
+            p.update();
+            p.draw();
+          });
+          requestAnimationFrame(animate);
+        }
+        animate();
+      }
+
+      function initTiltEffect() {
+        const container = document.querySelector(".container");
+        if (!container) return;
+        document.addEventListener("mousemove", (e) => {
+          const xAxis = (window.innerWidth / 2 - e.pageX) / 40; // Max rotation
+          const yAxis = (window.innerHeight / 2 - e.pageY) / -30;
+          container.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+        container.addEventListener("mouseleave", () => {
+          container.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+        });
+      }
+
+      // ══════════════════════════════════════════════
+      // ██  MODULE 2: LIVE SERVER STATUS LED      ██
+      // ══════════════════════════════════════════════
+      const ledLabels = {
+        en: { idle: "IDLE", processing: "PROCESSING", cooldown: "COOLDOWN 5s" },
+        vi: {
+          idle: "SẴN SÀNG",
+          processing: "ĐANG XỬ LÝ",
+          cooldown: "CHỜ 5 GIÂY",
+        },
+      };
+
+      async function pollServerStatus() {
+        try {
+          const res = await fetch("/api/queue-status");
+          const data = await res.json();
+          const dot = document.getElementById("ledDot");
+          const label = document.getElementById("ledLabel");
+          if (!dot || !label) return;
+
+          dot.className = "led-dot"; // Reset
+          const labels = ledLabels[currentLang] || ledLabels.en;
+
+          if (data.status === "processing") {
+            dot.classList.add("processing");
+            label.textContent = labels.processing;
+          } else if (data.status === "cooldown") {
+            dot.classList.add("cooldown");
+            label.textContent = labels.cooldown;
+          } else {
+            dot.classList.add("idle");
+            label.textContent = labels.idle;
+          }
+        } catch (e) {
+          const label = document.getElementById("ledLabel");
+          if (label) label.textContent = "OFFLINE";
+        }
+      }
+
+      // ══════════════════════════════════════════════
+      // ██  MODULE 3: RIPPLE EFFECT ON BUTTON     ██
+      // ══════════════════════════════════════════════
+      function initRipple() {
+        const btn = document.getElementById("submitBtn");
+        if (!btn) return;
+        btn.addEventListener("click", function (e) {
+          const rect = btn.getBoundingClientRect();
+          const ripple = document.createElement("span");
+          ripple.className = "ripple";
+          const size = Math.max(rect.width, rect.height);
+          ripple.style.width = ripple.style.height = size + "px";
+          ripple.style.left = e.clientX - rect.left - size / 2 + "px";
+          ripple.style.top = e.clientY - rect.top - size / 2 + "px";
+          btn.appendChild(ripple);
+          setTimeout(() => ripple.remove(), 600);
+        });
+      }
+
+      // ══════════════════════════════════════════════
+      // ██  MODULE 4: NEON CHASE INPUT BORDER      ██
+      // ══════════════════════════════════════════════
+      function initNeonInput() {
+        const input = document.getElementById("username");
+        const wrap = document.getElementById("inputGlowWrap");
+        if (!input || !wrap) return;
+        input.addEventListener("focus", () => wrap.classList.add("active"));
+        input.addEventListener("blur", () => wrap.classList.remove("active"));
+      }
+
+      // ══════════════════════════════════════════════
+      // ██  MODULE 5: FOMO TOAST (Live Unlock Pop) ██
+      // ══════════════════════════════════════════════
+      let lastSeenActivity = null;
+
+      async function checkForNewUnlocks() {
+        try {
+          const res = await fetch("/api/recent-activity");
+          const data = await res.json();
+          if (!data.success || !data.activity || data.activity.length === 0)
+            return;
+
+          const latest = data.activity[0];
+          // Only show success unlocks as FOMO
+          if (latest.status === "error") return;
+
+          const latestKey = latest.username + "_" + latest.timestamp;
+          if (lastSeenActivity === null) {
+            lastSeenActivity = latestKey; // First load, don't toast
+            return;
+          }
+          if (latestKey !== lastSeenActivity) {
+            lastSeenActivity = latestKey;
+            showFomoToast(latest.username);
+          }
+        } catch (e) {
+          /* Silently fail */
+        }
+      }
+
+      function showFomoToast(username) {
+        const container = document.getElementById("toastContainer");
+        if (!container) return;
+        const toast = document.createElement("div");
+        toast.className = "fomo-toast";
+        const msg =
+          currentLang === "vi"
+            ? `🎉 @${username} vừa mở khóa Gold thành công!`
+            : `🎉 @${username} just unlocked Gold!`;
+        toast.innerHTML = msg;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.classList.add("out");
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+
+      // ══════════════════════════════════════════════
+      // ██  INITIALIZATION                         ██
+      // ══════════════════════════════════════════════
+      document.addEventListener("DOMContentLoaded", () => {
+        // Core features
+        fetchSiteSettings();
+        fetchActivityFeed();
+        fetchRateLimit();
+        applyLang();
+
+        // NEW: UI/UX Modules
+        initParticles();
+        initTiltEffect();
+        initRipple();
+        initNeonInput();
+        pollServerStatus();
+
+        // Polling intervals
+        setInterval(fetchSiteSettings, 30000);
+        setInterval(fetchActivityFeed, 15000);
+        setInterval(fetchRateLimit, 30000);
+        setInterval(pollServerStatus, 2000); // LED every 2s
+        setInterval(checkForNewUnlocks, 10000); // FOMO every 10s
+      });
+    </script>
+  </body>
+</html>

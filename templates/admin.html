@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Locket Gold</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #00ffff;
+            --secondary: #ff00ff;
+            --bg: #030305;
+            --card: rgba(10, 10, 15, 0.6);
+            --text: #fff;
+            --text2: #a0a0b0;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 255, .06) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, .06) 0%, transparent 40%);
+        }
+
+        /* ── Login Screen ── */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .login-card {
+            background: rgba(10, 10, 15, 0.5);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            border-radius: 1.5rem;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1), 0 0 80px rgba(255, 0, 255, 0.05);
+            text-align: center;
+        }
+
+        .login-card h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            margin-bottom: .5rem;
+        }
+
+        .login-card p {
+            color: var(--text2);
+            font-size: .85rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-card .form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .login-card label {
+            display: block;
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text2);
+            margin-bottom: .5rem;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: .9rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            border-radius: .75rem;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: .95rem;
+            transition: border-color .3s, box-shadow .3s;
+            outline: none;
+        }
+
+        .login-card input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient);
+            border: none;
+            border-radius: .75rem;
+            color: #000;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .3s;
+            margin-top: .5rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-error {
+            color: #ff4444;
+            font-size: .85rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* ── Dashboard ── */
+        .dashboard {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            display: none;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: .8rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .header a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: .9rem;
+            opacity: .7;
+            transition: opacity .3s;
+        }
+
+        .header a:hover {
+            opacity: 1;
+        }
+
+        .lang-toggle,
+        .logout-btn {
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .2);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: .8rem;
+            backdrop-filter: blur(10px);
+            transition: background .3s, border-color .3s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .lang-toggle:hover,
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, .2);
+            border-color: rgba(255, 255, 255, .4);
+        }
+
+        .logout-btn {
+            border-color: rgba(255, 68, 68, .4);
+            color: #ff6666;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, .15);
+            border-color: rgba(255, 68, 68, .6);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 255, .2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: border-color .3s;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, .5);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 0, 255, .4);
+        }
+
+        .stat-label {
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text2);
+            margin-bottom: .75rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .stat-sub {
+            font-size: .8rem;
+            color: var(--text2);
+            margin-top: .5rem;
+        }
+
+        .chart-card {
+            background: var(--card);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 0, 255, .2);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, .5);
+        }
+
+        .chart-card h2 {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            color: var(--text2);
+        }
+
+        .health-bar {
+            height: 10px;
+            background: rgba(0, 0, 0, .5);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: .5rem;
+            border: 1px solid rgba(0, 255, 255, .2);
+        }
+
+        .health-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width .5s ease, background .5s ease;
+        }
+
+        .scrollable-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .scrollable-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .scrollable-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        .scrollable-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .8rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            font-size: .9rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-user {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .activity-time {
+            color: var(--text2);
+            font-size: .8rem;
+        }
+
+        .activity-plan {
+            font-size: .75rem;
+            color: var(--secondary);
+            background: rgba(255, 0, 255, .1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .main-dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media(max-width: 1100px) {
+            .main-dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Management Panel ── */
+        .mgmt-card {
+            background: var(--card);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 255, .2);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, .5);
+        }
+
+        .mgmt-card h2 {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            color: var(--text2);
+        }
+
+        .mgmt-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .mgmt-group label {
+            display: block;
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text2);
+            margin-bottom: .5rem;
+        }
+
+        .mgmt-group input[type="text"],
+        .mgmt-group input[type="number"],
+        .mgmt-group textarea {
+            width: 100%;
+            padding: .8rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            border-radius: .75rem;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: .9rem;
+            transition: border-color .3s;
+            outline: none;
+            resize: vertical;
+        }
+
+        .mgmt-group input:focus,
+        .mgmt-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.15);
+        }
+
+        .mgmt-group textarea {
+            min-height: 80px;
+        }
+
+        .mgmt-group .hint {
+            font-size: .75rem;
+            color: var(--text2);
+            margin-top: .3rem;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background .3s, border-color .3s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            left: 2px;
+            bottom: 2px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform .3s;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: rgba(255, 0, 255, 0.3);
+            border-color: var(--secondary);
+        }
+
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(24px);
+            background: var(--secondary);
+        }
+
+        .toggle-label {
+            font-size: .9rem;
+            color: var(--text);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient);
+            border: none;
+            border-radius: .75rem;
+            color: #000;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .3s;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .save-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Glass popup override for SweetAlert */
+        .glass-popup {
+            background: rgba(10, 10, 20, 0.85) !important;
+            backdrop-filter: blur(25px) !important;
+            border: 1px solid rgba(0, 255, 255, 0.15) !important;
+            border-radius: 1.5rem !important;
+        }
+
+        .glass-confirm-btn {
+            background: var(--gradient) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+            border-radius: .75rem !important;
+            padding: .7rem 2rem !important;
+            font-family: 'Outfit', sans-serif !important;
+            border: none !important;
+        }
+
+        @media(max-width:600px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════ LOGIN SCREEN ═══════ -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <h1 data-i18n="loginTitle">Admin Panel</h1>
+            <p data-i18n="loginSubtitle">Đăng nhập để quản lý hệ thống</p>
+
+            <div class="form-group">
+                <label data-i18n="usernameLabel">Tên đăng nhập</label>
+                <input type="text" id="loginUsername" placeholder="admin" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label data-i18n="passwordLabel">Mật khẩu</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button class="login-btn" id="loginBtn" onclick="doLogin()" data-i18n="loginBtn">Đăng Nhập</button>
+            <div class="login-error" id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- ═══════ DASHBOARD (Hidden until login) ═══════ -->
+    <div class="dashboard" id="dashboardScreen">
+        <div class="header">
+            <h1 data-i18n="title">Admin Dashboard</h1>
+            <div class="header-actions">
+                <a href="/" data-i18n="backToApp">← Trở về Ứng Dụng</a>
+                <button class="lang-toggle" id="langToggle" onclick="toggleLang()">🌐 VI</button>
+                <button class="logout-btn" id="logoutBtn" onclick="doLogout()" data-i18n="logoutBtn">Đăng Xuất</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label" data-i18n="totalUnlocks">Tổng Mở Khóa</div>
+                <div class="stat-value" id="totalUnlocks">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" data-i18n="today">Hôm Nay</div>
+                <div class="stat-value" id="todayUnlocks">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" data-i18n="errors">Lỗi</div>
+                <div class="stat-value" id="totalErrors">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" data-i18n="apiHealth">Tình Trạng API</div>
+                <div class="stat-value" id="apiHealth" style="font-size:1.2rem;">—</div>
+                <div class="health-bar">
+                    <div class="health-fill" id="healthFill" style="width:0%;background:var(--primary);"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3 Column Layout -->
+    <div class="main-dashboard-content">
+        <!-- Left: Recent Activity -->
+        <div class="chart-card" style="margin-bottom:0">
+            <h2 data-i18n="recentActivity">Hoạt Động Gần Đây</h2>
+            <ul class="activity-list scrollable-list" id="activityList">
+                <li class="activity-item"><span style="color:var(--text2)" data-i18n="loading">Đang tải...</span></li>
+            </ul>
+        </div>
+
+        <!-- Middle: Chart -->
+        <div class="chart-card" style="margin-bottom:0">
+            <h2 data-i18n="chartTitle">Mở Khóa — 7 Ngày Qua</h2>
+            <canvas id="dailyChart" height="250"></canvas>
+        </div>
+
+        <!-- Right: Error Logs -->
+        <div class="chart-card" style="margin-bottom:0">
+            <h2 data-i18n="errorLogTitle" style="color:var(--danger)">Debug Log Lỗi</h2>
+            <ul class="activity-list scrollable-list" id="errorLogList">
+                <li class="activity-item"><span style="color:var(--text2)" data-i18n="loading">Đang tải...</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Management Panel -->
+    <div class="mgmt-card">
+        <h2 data-i18n="mgmtTitle">⚙️ Quản Lý Trang Web</h2>
+
+        <div class="mgmt-group">
+            <label data-i18n="announcementLabel">Thông Báo Toàn Trang</label>
+            <textarea id="settingAnnouncement"
+                placeholder="Nhập nội dung thông báo hiển thị trên trang chính..."></textarea>
+            <div class="hint" data-i18n="announcementHint">Để trống để ẩn banner thông báo</div>
+        </div>
+
+        <div class="mgmt-group">
+            <label data-i18n="maintenanceLabel">Chế Độ Bảo Trì</label>
+            <div class="toggle-container">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="settingMaintenance">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label" id="maintenanceStatus" data-i18n="maintenanceOff">Tắt</span>
+            </div>
+            <div class="hint" data-i18n="maintenanceHint">Khi bật, nút mở khóa trên trang chính sẽ bị vô hiệu hóa
+            </div>
+        </div>
+
+        <div class="mgmt-group">
+            <label data-i18n="dnsLabel">DNS Hostname (Android)</label>
+            <input type="text" id="settingDns" placeholder="ff384a.dns.nextdns.io">
+            <div class="hint" data-i18n="dnsHint">Hostname hiển thị trong hướng dẫn cài đặt Android</div>
+        </div>
+
+        <div class="mgmt-group">
+            <label data-i18n="dailyLimitLabel">Giới Hạn Mở Khóa / Ngày</label>
+            <input type="number" id="settingDailyLimit" min="0" placeholder="0">
+            <div class="hint" data-i18n="dailyLimitHint">Nhập 0 để không giới hạn</div>
+        </div>
+
+        <div class="mgmt-group">
+            <label data-i18n="qrDonateLabel">Ảnh QR Donate</label>
+            <div>
+                <button type="button" class="save-btn" id="qrUploadBtn"
+                    style="margin-top:0.5rem; margin-bottom:0.5rem; background:var(--surface); border:1px solid var(--border); color:var(--text); width: auto; padding: 0.5rem 1rem;"
+                    onclick="document.getElementById('qrFileInput').click()">Chọn Ảnh Từ Thiết Bị</button>
+                <button type="button" class="save-btn" id="qrClearBtn"
+                    style="margin-top:0.5rem; margin-bottom:0.5rem; background:#ff4444; width: auto; padding: 0.5rem 1rem; display:none;"
+                    onclick="clearQrPreview()">Xóa Ảnh</button>
+            </div>
+
+            <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQrUpload(event)">
+            <input type="hidden" id="settingQrDonate">
+
+            <div id="qrPreviewWrapper" style="display:none; margin-top:0.5rem;">
+                <img id="qrPreviewImg" style="max-height:150px; border-radius:0.5rem; border:1px solid var(--border);">
+            </div>
+
+            <div class="hint" data-i18n="qrDonateHint">Tải ảnh QR donate của bạn lên. Vercel sẽ tự lưu mã ảnh. Để
+                trống để ẩn.</div>
+        </div>
+
+        <div class="mgmt-group">
+            <label data-i18n="welcomePopupLabel">Pop-up Chào Mừng</label>
+            <textarea id="settingWelcomePopup" placeholder="Nhập nội dung pop-up hiển khi truy cập trang..."></textarea>
+            <div class="hint" data-i18n="welcomePopupHint">Để trống để tắt pop-up chào mừng</div>
+        </div>
+
+        <div class="mgmt-group">
+            <label data-i18n="telegramLinkLabel">Link Nhóm Telegram (Popup)</label>
+            <input type="text" id="settingTelegramLink" placeholder="https://t.me/yourgroup">
+            <div class="hint" data-i18n="telegramLinkHint">Sẽ hiển thị thành Nút chuyển tiếp cạnh Nút Đã Hiểu của Popup
+                Chào mừng.</div>
+        </div>
+
+        <button class="save-btn" id="saveBtn" onclick="saveSettings()" data-i18n="saveBtn">Lưu Cài Đặt</button>
+    </div>
+
+    <!-- Token Editor -->
+    <div class="mgmt-card">
+        <h2 data-i18n="tokenTitle">🔑 Quản Lý Token</h2>
+        <div class="mgmt-group">
+            <label data-i18n="tokenCountLabel">Số Token Hiện Tại</label>
+            <div id="tokenCount" style="font-size:1.5rem; font-weight:700; color:var(--primary);">-</div>
+        </div>
+        <div id="tokenList"></div>
+        <div class="mgmt-group" style="margin-top:1rem;">
+            <label data-i18n="addTokenLabel">Thêm / Cập Nhật Token</label>
+            <div class="hint" data-i18n="tokenNameHint" style="margin-bottom:.5rem;">Tên token (đặt gì cũng được)
+            </div>
+            <input type="text" id="newTokenName" placeholder="Production_VNM_2" style="margin-bottom:.5rem;">
+            <div class="hint" style="margin-bottom:.3rem;">fetch_token</div>
+            <textarea id="newFetchToken" placeholder="Paste fetch_token tại đây..."
+                style="min-height:60px; margin-bottom:.5rem;"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="save-btn" onclick="appendToken()" data-i18n="addTokenBtn">Thêm Token</button>
+            <button class="save-btn" style="background:var(--danger);" onclick="clearTokens()"
+                data-i18n="clearTokenBtn">Xóa Tất Cả</button>
+        </div>
+        <div class="hint" style="margin-top:.5rem; text-align:center;" data-i18n="addTokenHint">Sẽ thêm token mạng
+            này vào danh sách hiện tại</div>
+    </div>
+
+    <!-- Password Change -->
+    <div class="mgmt-card">
+        <h2 data-i18n="pwTitle">🔒 Đổi Mật Khẩu Admin</h2>
+        <div class="mgmt-group">
+            <label data-i18n="currentPwLabel">Mật Khẩu Hiện Tại</label>
+            <input type="password" id="currentPassword" placeholder="••••••••">
+        </div>
+        <div class="mgmt-group">
+            <label data-i18n="newPwLabel">Mật Khẩu Mới</label>
+            <input type="password" id="newPassword" placeholder="Ít nhất 4 ký tự">
+        </div>
+        <div class="mgmt-group">
+            <label data-i18n="confirmPwLabel">Xác Nhận Mật Khẩu Mới</label>
+            <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới">
+        </div>
+        <button class="save-btn" onclick="changePassword()" data-i18n="changePwBtn">Đổi Mật Khẩu</button>
+    </div>
+    </div>
+
+    <script>
+        // ── Swal Glass Theme ──
+        const swalGlass = {
+            background: 'transparent',
+            customClass: {
+                popup: 'glass-popup',
+                confirmButton: 'glass-confirm-btn',
+            },
+            buttonsStyling: false
+        };
+
+        // ── i18n System ──
+        let currentLang = localStorage.getItem('lang') || 'vi';
+        const i18n = {
+            en: {
+                loginTitle: 'Admin Panel',
+                loginSubtitle: 'Sign in to manage the system',
+                usernameLabel: 'Username',
+                passwordLabel: 'Password',
+                loginBtn: 'Sign In',
+                loginFail: 'Incorrect username or password!',
+                title: 'Admin Dashboard',
+                backToApp: '← Back to App',
+                logoutBtn: 'Sign Out',
+                totalUnlocks: 'Total Unlocks',
+                today: 'Today',
+                errors: 'Errors',
+                apiHealth: 'API Health',
+                chartTitle: 'Unlocks — Last 7 Days',
+                recentActivity: 'Recent Activity',
+                errorLogTitle: 'Error Debug Logs',
+                loading: 'Loading...',
+                noActivity: 'No activity yet',
+                unlocksLabel: 'Unlocks',
+                mgmtTitle: '⚙️ Website Management',
+                announcementLabel: 'Site-Wide Announcement',
+                announcementHint: 'Leave empty to hide the announcement banner',
+                maintenanceLabel: 'Maintenance Mode',
+                maintenanceOn: 'ON',
+                maintenanceOff: 'OFF',
+                maintenanceHint: 'When enabled, the unlock button on the main page will be disabled',
+                dnsLabel: 'DNS Hostname (Android)',
+                dnsHint: 'Hostname shown in Android setup instructions',
+                dailyLimitLabel: 'Daily Unlock Limit',
+                dailyLimitHint: 'Set to 0 for unlimited',
+                saveBtn: 'Save Settings',
+                saveSuccess: 'Settings saved successfully!',
+                saveFail: 'Failed to save settings',
+                qrDonateLabel: 'QR Donate (Image URL)',
+                qrDonateHint: 'Image URL for the QR donation code shown on the main page. Leave empty to hide',
+                welcomePopupLabel: 'Welcome Popup',
+                welcomePopupHint: 'Leave empty to disable the welcome popup',
+                telegramLinkLabel: 'Telegram Group Link',
+                telegramLinkHint: 'Will be shown as a Join button next to the Got It button on the Welcome Popup.',
+                tokenTitle: '🔑 Token Management',
+                tokenCountLabel: 'Current Tokens',
+                addTokenLabel: 'Add / Update Token',
+                tokenNameHint: 'Token name (any label)',
+                addTokenBtn: 'Add Token',
+                addTokenHint: 'Will append this new token to the current list',
+                clearTokenBtn: 'Clear All',
+                tokenSuccess: 'Token updated successfully!',
+                tokenFail: 'Failed to update token',
+                pwTitle: '🔒 Change Admin Password',
+                currentPwLabel: 'Current Password',
+                newPwLabel: 'New Password',
+                confirmPwLabel: 'Confirm New Password',
+                changePwBtn: 'Change Password',
+                pwSuccess: 'Password changed successfully!',
+                pwFail: 'Failed to change password',
+            },
+            vi: {
+                loginTitle: 'Admin Panel',
+                loginSubtitle: 'Đăng nhập để quản lý hệ thống',
+                usernameLabel: 'Tên Đăng Nhập',
+                passwordLabel: 'Mật Khẩu',
+                loginBtn: 'Đăng Nhập',
+                loginFail: 'Sai tên đăng nhập hoặc mật khẩu!',
+                title: 'Bảng Điều Khiển',
+                backToApp: '← Trở về Ứng Dụng',
+                logoutBtn: 'Đăng Xuất',
+                totalUnlocks: 'Tổng Mở Khóa',
+                today: 'Hôm Nay',
+                errors: 'Lỗi',
+                apiHealth: 'Tình Trạng API',
+                chartTitle: 'Mở Khóa — 7 Ngày Qua',
+                recentActivity: 'Hoạt Động Gần Đây',
+                errorLogTitle: 'Debug Log Lỗi',
+                loading: 'Đang tải...',
+                noActivity: 'Chưa có hoạt động',
+                unlocksLabel: 'Mở Khóa',
+                mgmtTitle: '⚙️ Quản Lý Trang Web',
+                announcementLabel: 'Thông Báo Toàn Trang',
+                announcementHint: 'Để trống để ẩn banner thông báo',
+                maintenanceLabel: 'Chế Độ Bảo Trì',
+                maintenanceOn: 'BẬT',
+                maintenanceOff: 'TẮT',
+                maintenanceHint: 'Khi bật, nút mở khóa trên trang chính sẽ bị vô hiệu hóa',
+                dnsLabel: 'DNS Hostname (Android)',
+                dnsHint: 'Hostname hiển thị trong hướng dẫn cài đặt Android',
+                dailyLimitLabel: 'Giới Hạn Mở Khóa / Ngày',
+                dailyLimitHint: 'Nhập 0 để không giới hạn',
+                saveBtn: 'Lưu Cài Đặt',
+                saveSuccess: 'Đã lưu cài đặt thành công!',
+                saveFail: 'Lưu cài đặt thất bại',
+                qrDonateLabel: 'QR Donate (URL Ảnh)',
+                qrDonateHint: 'Đường dẫn ảnh QR donate sẽ hiển thị trên trang chính. Để trống để ẩn',
+                welcomePopupLabel: 'Pop-up Chào Mừng',
+                welcomePopupHint: 'Để trống để tắt pop-up chào mừng',
+                telegramLinkLabel: 'Link Nhóm Telegram (Popup)',
+                telegramLinkHint: 'Sẽ hiển thị thành Nút chuyển tiếp cạnh Nút Đã Hiểu của Popup Chào mừng.',
+                tokenTitle: '🔑 Quản Lý Token',
+                tokenCountLabel: 'Số Token Hiện Tại',
+                addTokenLabel: 'Thêm / Cập Nhật Token',
+                tokenNameHint: 'Tên token (đặt gì cũng được)',
+                addTokenBtn: 'Thêm Token Mới',
+                addTokenHint: 'Sẽ lưu nối tiếp token này vào danh sách hiện tại',
+                clearTokenBtn: 'Xóa Tất Cả',
+                tokenSuccess: 'Cập nhật token thành công!',
+                tokenFail: 'Cập nhật token thất bại',
+                pwTitle: '🔒 Đổi Mật Khẩu Admin',
+                currentPwLabel: 'Mật Khẩu Hiện Tại',
+                newPwLabel: 'Mật Khẩu Mới',
+                confirmPwLabel: 'Xác Nhận Mật Khẩu Mới',
+                changePwBtn: 'Đổi Mật Khẩu',
+                pwSuccess: 'Đổi mật khẩu thành công!',
+                pwFail: 'Đổi mật khẩu thất bại',
+            }
+        };
+
+        function t(key) { return i18n[currentLang][key] || key; }
+
+        function applyLang() {
+            const lang = i18n[currentLang];
+            document.getElementById('langToggle').textContent = '🌐 ' + currentLang.toUpperCase();
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (lang[key]) el.textContent = lang[key];
+            });
+            // Update maintenance toggle label
+            const mc = document.getElementById('settingMaintenance');
+            if (mc) {
+                document.getElementById('maintenanceStatus').textContent = mc.checked ? t('maintenanceOn') : t('maintenanceOff');
+            }
+            if (dailyChart) {
+                dailyChart.data.datasets[0].label = t('unlocksLabel');
+                dailyChart.update();
+            }
+        }
+
+        function toggleLang() {
+            currentLang = currentLang === 'en' ? 'vi' : 'en';
+            localStorage.setItem('lang', currentLang);
+            applyLang();
+        }
+
+        // ── Maintenance toggle label update ──
+        document.getElementById('settingMaintenance').addEventListener('change', function () {
+            document.getElementById('maintenanceStatus').textContent = this.checked ? t('maintenanceOn') : t('maintenanceOff');
+        });
+
+        // ── Auth Functions ──
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/admin/check');
+                const data = await res.json();
+                if (data.success && data.logged_in) {
+                    showDashboard();
+                } else {
+                    showLogin();
+                }
+            } catch (e) {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboardScreen').style.display = 'none';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboardScreen').style.display = 'block';
+            fetchStats();
+            fetchActivity();
+            fetchRateLimit();
+            loadSettings();
+            loadTokens();
+            applyLang();
+        }
+
+        async function doLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+
+            if (!username || !password) {
+                errorEl.textContent = t('loginFail');
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    errorEl.style.display = 'none';
+                    showDashboard();
+                } else {
+                    errorEl.textContent = data.msg || t('loginFail');
+                    errorEl.style.display = 'block';
+                }
+            } catch (e) {
+                errorEl.textContent = 'Connection error';
+                errorEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function doLogout() {
+            try {
+                await fetch('/api/admin/logout', { method: 'POST' });
+            } catch (e) { }
+            showLogin();
+        }
+
+        // Enter key to login
+        document.getElementById('loginPassword').addEventListener('keyup', function (e) {
+            if (e.key === 'Enter') doLogin();
+        });
+        document.getElementById('loginUsername').addEventListener('keyup', function (e) {
+            if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+        });
+
+        // ── Settings Management ──
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/admin/settings');
+                if (res.status === 401) { showLogin(); return; }
+                const data = await res.json();
+                if (data.success) {
+                    const s = data.settings;
+                    document.getElementById('settingAnnouncement').value = s.announcement || '';
+                    document.getElementById('settingMaintenance').checked = s.maintenance_mode || false;
+                    document.getElementById('settingDns').value = s.dns_hostname || '';
+                    document.getElementById('settingDailyLimit').value = s.max_daily_unlocks || 0;
+
+                    const qrVal = s.qr_donate_url || '';
+                    document.getElementById('settingQrDonate').value = qrVal;
+                    if (qrVal) {
+                        document.getElementById('qrPreviewImg').src = qrVal;
+                        document.getElementById('qrPreviewWrapper').style.display = 'block';
+                        document.getElementById('qrClearBtn').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('qrPreviewWrapper').style.display = 'none';
+                        document.getElementById('qrClearBtn').style.display = 'none';
+                    }
+
+                    document.getElementById('settingWelcomePopup').value = s.welcome_popup || '';
+                    document.getElementById('settingTelegramLink').value = s.telegram_group_link || '';
+                    document.getElementById('maintenanceStatus').textContent =
+                        s.maintenance_mode ? t('maintenanceOn') : t('maintenanceOff');
+                }
+            } catch (e) { console.error('Load settings error:', e); }
+        }
+
+        async function saveSettings() {
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+
+            const settings = {
+                announcement: document.getElementById('settingAnnouncement').value,
+                maintenance_mode: document.getElementById('settingMaintenance').checked,
+                dns_hostname: document.getElementById('settingDns').value.trim(),
+                max_daily_unlocks: parseInt(document.getElementById('settingDailyLimit').value) || 0,
+                qr_donate_url: document.getElementById('settingQrDonate').value.trim(),
+                welcome_popup: document.getElementById('settingWelcomePopup').value,
+                telegram_group_link: document.getElementById('settingTelegramLink').value.trim(),
+            };
+
+            try {
+                const res = await fetch('/api/admin/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                if (res.status === 401) { showLogin(); return; }
+                const data = await res.json();
+
+                Swal.fire({
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? t('saveSuccess') : t('saveFail'),
+                    text: data.msg || '',
+                    ...swalGlass,
+                    confirmButtonText: 'OK'
+                });
+            } catch (e) {
+                Swal.fire({
+                    icon: 'error',
+                    title: t('saveFail'),
+                    ...swalGlass,
+                    confirmButtonText: 'OK'
+                });
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // ── QR Upload Logic ──
+        function handleQrUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                Swal.fire({ icon: 'warning', title: 'File quá lớn', text: 'Vui lòng chọn ảnh dưới 2MB để tránh nặng Vercel', ...swalGlass, confirmButtonText: 'OK' });
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const base64Str = e.target.result;
+                document.getElementById('settingQrDonate').value = base64Str;
+                document.getElementById('qrPreviewImg').src = base64Str;
+                document.getElementById('qrPreviewWrapper').style.display = 'block';
+                document.getElementById('qrClearBtn').style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearQrPreview() {
+            document.getElementById('settingQrDonate').value = '';
+            document.getElementById('qrPreviewImg').src = '';
+            document.getElementById('qrPreviewWrapper').style.display = 'none';
+            document.getElementById('qrClearBtn').style.display = 'none';
+            document.getElementById('qrFileInput').value = '';
+        }
+
+        // ── Token Management ──
+        async function loadTokens() {
+            try {
+                const res = await fetch('/api/admin/tokens');
+                if (res.status === 401) return;
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('tokenCount').textContent = data.count;
+                    const list = document.getElementById('tokenList');
+                    if (data.tokens.length === 0) {
+                        list.innerHTML = '<div style="color:var(--text2); font-size:.85rem;">No tokens configured</div>';
+                    } else {
+                        list.innerHTML = data.tokens.map((tok, i) => {
+                            const isDead = tok.status === 'dead';
+                            return `
+                            <div style="margin-bottom:.8rem; padding:.8rem; background:${isDead ? 'rgba(255,0,0,0.05)' : 'rgba(0,255,255,.03)'}; border:1px solid ${isDead ? 'var(--danger)' : 'rgba(0,255,255,.1)'}; border-radius:.5rem; position:relative;">
+                                <div style="font-weight:600; color:${isDead ? 'var(--danger)' : 'var(--primary)'}; margin-bottom:.3rem; padding-right:60px;">
+                                    ${tok.name} 
+                                    ${isDead ? '<span style="background:var(--danger); color:#fff; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:5px;">DEAD</span>' : '<span style="background:var(--primary); color:#000; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:5px;">ACTIVE</span>'}
+                                </div>
+                                <button onclick="deleteToken('${tok.name}')" style="position:absolute; top:10px; right:10px; background:var(--danger); border:none; padding:4px 8px; border-radius:4px; font-size:12px; cursor:pointer;">Xóa</button>
+                                <div style="font-size:.75rem; color:var(--text2); word-break:break-all;">fetch_token: ${tok.fetch_token}</div>
+                                <div style="font-size:.75rem; color:var(--text2); word-break:break-all; margin-top:.2rem;">app_transaction: ${tok.app_transaction}</div>
+                            </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (e) { console.error('Load tokens error:', e); }
+        }
+
+        async function appendToken() {
+            const name = document.getElementById('newTokenName').value.trim() || 'Custom_Token';
+            const fetchToken = document.getElementById('newFetchToken').value.trim();
+            const appTransaction = "";
+
+            if (!fetchToken) {
+                Swal.fire({ icon: 'warning', title: 'Thiếu dữ liệu', text: 'Vui lòng nhập fetch_token', ...swalGlass, confirmButtonText: 'OK' });
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tokens: [{
+                            name: name,
+                            fetch_token: fetchToken,
+                            app_transaction: appTransaction,
+                            hash_params: '',
+                            hash_headers: '',
+                            is_sandbox: false,
+                            status: 'active'
+                        }]
+                    })
+                });
+                if (res.status === 401) { showLogin(); return; }
+                const data = await res.json();
+                Swal.fire({
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? t('tokenSuccess') : t('tokenFail'),
+                    text: data.msg || '',
+                    ...swalGlass, confirmButtonText: 'OK'
+                });
+                if (data.success) {
+                    document.getElementById('newTokenName').value = '';
+                    document.getElementById('newFetchToken').value = '';
+                    loadTokens();
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: t('tokenFail'), ...swalGlass, confirmButtonText: 'OK' });
+            }
+        }
+
+        async function deleteToken(name) {
+            if (!confirm(`Bạn có chắc muốn xóa token '${name}'?`)) return;
+            try {
+                const res = await fetch(`/api/admin/tokens/${encodeURIComponent(name)}`, { method: 'DELETE' });
+                if (res.status === 401) { showLogin(); return; }
+                const data = await res.json();
+                Swal.fire({
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? 'Thành công' : 'Thất bại',
+                    text: data.msg || '',
+                    ...swalGlass, confirmButtonText: 'OK'
+                });
+                if (data.success) {
+                    loadTokens();
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message, ...swalGlass, confirmButtonText: 'OK' });
+            }
+        }
+
+        async function clearTokens() {
+            if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ Token? (Sẽ chỉ còn token mặc định)')) return;
+            try {
+                const res = await fetch('/api/admin/tokens/clear', { method: 'DELETE' });
+                if (res.status === 401) { showLogin(); return; }
+                const data = await res.json();
+                Swal.fire({
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? t('tokenSuccess') : t('tokenFail'),
+                    text: data.msg || '',
+                    ...swalGlass, confirmButtonText: 'OK'
+                });
+                if (data.success) {
+                    loadTokens();
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: t('tokenFail'), ...swalGlass, confirmButtonText: 'OK' });
+            }
+        }
+
+        // ── Change Password ──
+        async function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPw = document.getElementById('newPassword').value;
+            const confirmPw = document.getElementById('confirmPassword').value;
+
+            if (!current || !newPw || !confirmPw) {
+                Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng nhập đầy đủ các trường', ...swalGlass, confirmButtonText: 'OK' });
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ current_password: current, new_password: newPw, confirm_password: confirmPw })
+                });
+                if (res.status === 401) { showLogin(); return; }
+                const data = await res.json();
+                Swal.fire({
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? t('pwSuccess') : t('pwFail'),
+                    text: data.msg || '',
+                    ...swalGlass, confirmButtonText: 'OK'
+                });
+                if (data.success) {
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: t('pwFail'), ...swalGlass, confirmButtonText: 'OK' });
+            }
+        }
+
+        // ── Stats / Activity / Rate Limit ── (same as before, with auth check)
+        let dailyChart = null;
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/admin/stats');
+                if (res.status === 401) { showLogin(); return; }
+                const data = await res.json();
+                if (!data.success) return;
+
+                document.getElementById('totalUnlocks').textContent = data.total_unlocks;
+                document.getElementById('todayUnlocks').textContent = data.today_unlocks;
+                document.getElementById('totalErrors').textContent = data.total_errors;
+
+                const labels = data.daily_chart.map(d => d.date.slice(5));
+                const values = data.daily_chart.map(d => d.count);
+                if (dailyChart) {
+                    dailyChart.data.labels = labels;
+                    dailyChart.data.datasets[0].data = values;
+                    dailyChart.update();
+                } else {
+                    const ctx = document.getElementById('dailyChart').getContext('2d');
+                    const gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
+                    gradient.addColorStop(0, '#00ffff');
+                    gradient.addColorStop(1, '#ff00ff');
+                    dailyChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: t('unlocksLabel'),
+                                data: values,
+                                backgroundColor: gradient,
+                                borderRadius: 6,
+                                borderSkipped: false,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#666' } },
+                                y: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#666', stepSize: 1 }, beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+            } catch (e) { console.error('Stats fetch error:', e); }
+        }
+
+        async function fetchActivity() {
+            try {
+                const res = await fetch('/api/recent-activity');
+                const data = await res.json();
+                const list = document.getElementById('activityList');
+                const errorList = document.getElementById('errorLogList');
+                if (!data.success || data.activity.length === 0) {
+                    list.innerHTML = `<li class="activity-item"><span style="color:var(--text2)">${t('noActivity')}</span></li>`;
+                    if (errorList) errorList.innerHTML = `<li class="activity-item"><span style="color:var(--text2)">${t('noActivity')}</span></li>`;
+                    return;
+                }
+
+                let successItems = [];
+                let errorItems = [];
+
+                data.activity.forEach(a => {
+                    const time = new Date(a.timestamp);
+                    const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    if (a.status === 'error') {
+                        errorItems.push(`<li class="activity-item" style="flex-wrap: wrap; border-left: 3px solid var(--danger); padding-left: 10px; background: rgba(255,0,0,0.02)">
+                            <div style="display:flex; justify-content:space-between; width:100%;">
+                                <span class="activity-user" style="color:var(--danger)">@${a.username}</span>
+                                <span class="activity-time">${timeStr}</span>
+                            </div>
+                            <div style="flex-basis: 100%; font-size: 0.75rem; color: #ff9999; margin-top: 5px; word-break: break-all;">
+                                ⚠️ Lỗi: ${a.product_id}
+                            </div>
+                            <div style="flex-basis: 100%; font-size: 0.75rem; color: var(--text2); margin-top: 5px; text-align: center; background: rgba(255,0,0,.05); padding: 2px; border-radius: 4px;">
+                                🔑 Token: <span style="color:#ffcccc">${a.used_token || 'Unknown'}</span>
+                            </div>
+                        </li>`);
+                    } else {
+                        successItems.push(`<li class="activity-item" style="flex-wrap: wrap;">
+                            <span class="activity-user">@${a.username}</span>
+                            <span class="activity-plan">${a.product_id}</span>
+                            <span class="activity-time">${timeStr}</span>
+                            <div style="flex-basis: 100%; font-size: 0.75rem; color: var(--text2); margin-top: 5px; text-align: center; background: rgba(0,255,255,.05); padding: 2px; border-radius: 4px;">
+                                🔑 Token: <span style="color:var(--primary)">${a.used_token || 'Unknown'}</span>
+                            </div>
+                        </li>`);
+                    }
+                });
+
+                if (successItems.length === 0) list.innerHTML = `<li class="activity-item"><span style="color:var(--text2)">${t('noActivity')}</span></li>`;
+                else list.innerHTML = successItems.join('');
+
+                if (errorList) {
+                    if (errorItems.length === 0) errorList.innerHTML = `<li class="activity-item"><span style="color:var(--text2)">${t('noActivity')}</span></li>`;
+                    else errorList.innerHTML = errorItems.join('');
+                }
+            } catch (e) { console.error('Activity fetch error:', e); }
+        }
+
+        async function fetchRateLimit() {
+            try {
+                const res = await fetch('/api/rate-limit');
+                const data = await res.json();
+                const el = document.getElementById('apiHealth');
+                const fill = document.getElementById('healthFill');
+                if (!data.success || data.remaining === null) {
+                    el.textContent = 'OK';
+                    fill.style.width = '100%';
+                    fill.style.background = 'var(--primary)';
+                    return;
+                }
+                const pct = data.limit > 0 ? Math.round((data.remaining / data.limit) * 100) : 100;
+                el.textContent = `${data.remaining}/${data.limit}`;
+                fill.style.width = pct + '%';
+                if (pct > 60) fill.style.background = '#00ffaa';
+                else if (pct > 30) fill.style.background = '#ffaa00';
+                else fill.style.background = '#ff4444';
+            } catch (e) { console.error('Rate limit fetch error:', e); }
+        }
+
+        // ── Init ──
+        checkAuth();
+        applyLang();
+        setInterval(fetchStats, 10000);
+        setInterval(fetchActivity, 15000);
+        setInterval(fetchRateLimit, 10000);
+    </script>
+</body>
+
+</html>
