@@ -37,7 +37,7 @@ class RedisSiteSettings:
             "announcement": "",
             "dns_hostname": "ff384a.dns.nextdns.io",
             "max_daily_unlocks": 0,
-            "qr_donate_url": "https://ibb.co/My7d99NB",
+            "qr_donate_url": "https://i.imgur.com/your-qr.png",
             "welcome_popup": "Chào mừng bạn đến với Locket Gold Unlocker! 🎉",
             "telegram_group_link": "https://t.me/WhoisCatee"
         }

@@ -4,7 +4,7 @@ import time
 import requests
 
 def send_telegram_notification(username, uid, product_id, raw_json):
-    bot_token = os.getenv("8261780305:AAFVq4FwcVhN6bsiosjI1QL5By33fXJ0OM4")
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
     if not bot_token or not chat_id:
