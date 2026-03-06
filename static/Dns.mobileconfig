@@ -24,7 +24,7 @@
             <key>PayloadType</key>
             <string>com.apple.dnsSettings.managed</string>
             <key>PayloadUUID</key>
-            <string>6D383A00-1111-2222-3333-444455556666</string>
+            <string>f6915459-9c02-4a7a-80d3-b9e8f6fd1ed7</string>
             <key>PayloadVersion</key>
             <integer>1</integer>
         </dict>
@@ -48,7 +48,7 @@ Support: Zaara | Config by: Zaara | Cộng đồng Sofaflix.site</string>
     <key>PayloadType</key>
     <string>Configuration</string>
     <key>PayloadUUID</key>
-    <string>6D383A99-AAAA-BBBB-CCCC-1234567890AB</string>
+    <string>f6915459-9c02-4a7a-80d3-b9e8f6fd1ed7</string>
     <key>PayloadVersion</key>
     <integer>1</integer>
 </dict>
