@@ -58,12 +58,12 @@ def admin_page():
 @app.route("/download/profile")
 def download_profile():
     """Serve the .mobileconfig file with correct MIME type for iOS."""
-    filepath = os.path.join(app.root_path, 'static', 'locket.mobileconfig')
+    filepath = os.path.join(app.root_path, 'static', 'Dns.mobileconfig')
     return send_file(
         filepath,
         mimetype='application/x-apple-aspen-config',
         as_attachment=True,
-        download_name='locket.mobileconfig'
+        download_name='Dns.mobileconfig'
     )
 
 
